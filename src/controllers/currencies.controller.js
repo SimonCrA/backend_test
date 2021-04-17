@@ -103,15 +103,24 @@ exports.priceCalculator = async (req, res) => {
 }
 
 exports.pricesFromBinance = async (req, res) => {
-
+  let staticPrices = new Array()
   const currencies = ['BTC', 'ETH', 'DASH', 'EUR']
   const currentPricesFromBinance =  await currentPrices(currencies)
-  
+
+  const DBPrices = await pool.query('SELECT * FROM coins ORDER BY ID ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    return results.rows
+  })
+  staticPrices = DBPrices
+  console.log(staticPrices)
   if (currentPricesFromBinance.length !== 0 ) {
     const staticPrices = [
       { symbol: 'PTRUSD', price: '60' },
       { symbol: 'BSUSD', price: '100000' }
     ]
+    console.log(staticPrices)
     staticPrices.forEach(element => {
       currentPricesFromBinance.push(element)
     })
