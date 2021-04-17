@@ -1,4 +1,4 @@
-// const pool = require('../services/postgres.service')
+const pool = require('../services/postgres.service')
 const { currentPrices } = require('../services/binance.service')
 
 exports.priceCalculator = async (req, res) => {
@@ -128,4 +128,18 @@ exports.pricesFromBinance = async (req, res) => {
 
 
 
+}
+
+exports.setPtrBsPrices = async (req, res) => {
+  const symbol = req.body.symbol.toUpperCase()
+  const price = parseFloat(req.body.price)
+
+  pool.query('INSERT INTO coins (symbol, price) VALUES ($1, $2) RETURNING id, symbol, price',
+    [symbol, price],
+    (error, result) => {
+    if (error) {
+      throw error
+    }
+    res.status(200).json(`Coin ${ result.rows[0].symbol} added with ID: ${result.rows[0].id} and price ${result.rows[0].price}`)
+  })
 }
